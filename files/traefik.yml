@@ -32,3 +32,10 @@ certificatesResolvers:
       caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
       httpChallenge:
         entryPoint: http
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/supercert.pem
+        keyFile: /etc/traefik/supercert.key

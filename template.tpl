@@ -2,5 +2,5 @@ Distribution: {{hostvars[inventory_hostname]['ansible_facts']['distribution']}} 
 Kernel: {{hostvars[inventory_hostname]['ansible_facts']['kernel']}}
 vCPUs: {{hostvars[inventory_hostname]['ansible_facts']['processor_vcpus']}}
 RAM_MB: {{hostvars[inventory_hostname]['ansible_facts']['memtotal_mb']}}
+Boot_image: {{hostvars[inventory_hostname]['ansible_facts']['cmdline']['BOOT_IMAGE']}}
 Python3: {{hostvars[inventory_hostname]['ansible_facts']['python_version']}}
-BootImage: {{hostvars[inventory_hostname]['ansible_facts']['cmdline']}}
