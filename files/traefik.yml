@@ -7,7 +7,7 @@ entryPoints:
 http:
   routers:
     http-catchall:
-      rule: hostregexp(`{host:.+}`)
+      rule: HostRegexp(`{host:.+}`)
       entrypoints:
       - http
       middlewares:
