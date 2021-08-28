@@ -2,3 +2,7 @@
 platform_01_public_ip;
 platform_02_public_ip;
 platform_03_public_ip;
+
+Имя пользователя и пароль задаются переменными
+adminuser
+password
