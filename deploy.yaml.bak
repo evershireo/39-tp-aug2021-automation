@@ -1,0 +1,115 @@
+- hosts: all
+  tasks:
+          - name: Add docker repo key
+            become: yes
+            become_method: sudo
+            shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+          - name: Add docker repo
+            become: yes
+            become_method: sudo
+            shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+          
+          - name: Setup enviroment
+            become: yes
+            become_method: sudo
+            apt:
+                    update_cache: true
+                    name:
+                            - python3-pip
+                            - docker-ce
+                    state: present
+
+          - name: Setup python
+            become: yes
+            become_method: sudo
+            pip:
+                    name: docker
+
+          - name: Copy application package
+            become: yes
+            become_method: sudo
+            copy:
+                    src: ./files/web-53.tar
+                    dest: /root/web-53.tar
+
+          - name: Pull redis
+            become: yes
+            become_method: sudo
+            docker_image:
+                    source: pull
+                    name: redis
+                    tag: latest
+
+          - name: Start redis
+            become: yes
+            become_method: sudo
+            docker_container:
+                    name: redis-53
+                    image: redis
+                    restart_policy: always
+                    
+          - name: Deploy application image
+            become: yes
+            become_method: sudo
+            docker_image:
+                    name: web-53
+                    tag: latest
+                    source: load
+                    load_path: /root/web-53.tar
+
+          - name: Start application
+            become: yes
+            become_method: sudo
+            docker_container:
+                    name: web-53
+                    image: web-53
+                    restart_policy: always
+                    ports:
+                            - "8080:8080"
+                    labels:
+                            traefik.enable: "true"
+                            traefik.http.routers.web-53.entrypoints: "https"
+                            traefik.http.routers.web-53.rule: "Host(`app.gfd-39-comp-10.az.skillscloud.company`)"
+                            traefik.http.routers.web-53.tls: "true"
+                            traefik.http.routers.web-53.tls.certresolver: "letsEncrypt"
+
+                            traefik.http.services.web-53-service.loadbalancer.server.port: "8080"
+
+          - name: Pull traefik
+            become: yes
+            become_method: sudo
+            docker_image:
+                    source: pull
+                    name: traefik
+                    tag: latest
+
+          - name: copy traefik config
+            become: yes
+            become_method: sudo
+            copy:
+                    src: ./files/traefik.yml
+                    dest: /root/traefik.yml
+
+          - name: copy acme.json
+            become: yes
+            become_method: sudo
+            copy:
+                    src: ./files/acme.json
+                    dest: /root/acme.json
+
+          - name: Run traefik
+            become: yes
+            become_method: sudo
+            docker_container:
+                    name: traefik-53
+                    image: traefik
+                    restart_policy: always
+                    ports:
+                            - "80:80"
+                            - "443:443"
+                    volumes:
+                            - "/etc/localtime:/etc/localtime"
+                            - "/root/traefik.yml:/etc/traefik/traefik.yml"
+                            - "/var/run/docker.sock:/var/run/docker.sock"
+                            - "/root/acme.json:/etc/traefik/acme.json"
