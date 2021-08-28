@@ -1,16 +1,76 @@
----
-# If you don't know the Kung Fu, you can simply transfer kickstart bash script and run it
-# Notice that it doesn't garantee you an idempotent behaviour after repetitive execution
-- name: Execute kickstart script
-  hosts: all
-  gather_facts: false
+- hosts: all
   tasks:
-    - name: Copy script
-      ansible.builtin.copy:
-        src: ./kickstart.sh
-        dest: /home/azadmin/kickstart.sh
-        mode: u=rwx,g=r,o=r
-    - name: Run script
-      ansible.builtin.shell: /home/azadmin/kickstart.sh
+          - name: Setup enviroment
+            become: yes
+            become_method: sudo
+            apt:
+                    update_cache: true
+                    name: python3-pip
+                    state: present
+
+          - name: Setup python
+            become: yes
+            become_method: sudo
+            pip:
+                    name: docker
+
+          - name: Copy application package
+            become: yes
+            become_method: sudo
+            copy:
+                    src: ./files/web-53.tar
+                    dest: /root/web-53.tar
 
 
+          - name: Deploy application image
+            become: yes
+            become_method: sudo
+            docker_image:
+                    name: web-53
+                    tag: latest
+                    source: load
+                    load_path: /root/web-53.tar
+
+          - name: Start application
+            become: yes
+            become_method: sudo
+            docker_container:
+                    name: web-53
+                    image: web-53
+                    restart_policy: always
+                    ports:
+                            - "8080:8080"
+                    labels:
+                            traefik.enable: "true"
+                            traefik.http.routers.web-53.entrypoints: "http"
+                            traefik.http.routers.web-53.rule: "Host(`traefik.example.com`)"
+                            traefik.http.services.web-53-service.loadbalancer.server.port: "8080"
+
+          - name: Pull traefik
+            become: yes
+            become_method: sudo
+            docker_image:
+                    source: pull
+                    name: traefik
+                    tag: latest
+
+          - name: copy traefik config
+            become: yes
+            become_method: sudo
+            copy:
+                    src: ./files/traefik.yml
+                    dest: /root/traefik.yml
+
+          - name: Run traefik
+            become: yes
+            become_method: sudo
+            docker_container:
+                    name: traefik
+                    image: traefik
+                    restart_policy: always
+                    ports:
+                            - "80:80"
+                            - "443:443"
+                    volumes:
+                            - "/root/traefik.yml:/etc/traefik/traefik.yml"
+                            - "/var/run/docker.sock:/var/run/docker.sock"
