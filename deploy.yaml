@@ -26,12 +26,12 @@
             pip:
                     name: docker
 
-          - name: Copy application package
-            become: yes
-            become_method: sudo
+          - name: copy files
             copy:
-                    src: ./files/web-53.tar
-                    dest: /root/web-53.tar
+                    src: {{ item }}
+                    dest: /root/
+            with_lines: "find ./files/ -type f"
+
 
           - name: Pull redis
             become: yes
@@ -84,19 +84,7 @@
                     name: traefik
                     tag: latest
 
-          - name: copy traefik config
-            become: yes
-            become_method: sudo
-            copy:
-                    src: ./files/traefik.yml
-                    dest: /root/traefik.yml
 
-          - name: copy acme.json
-            become: yes
-            become_method: sudo
-            copy:
-                    src: ./files/acme.json
-                    dest: /root/acme.json
 
           - name: Run traefik
             become: yes
@@ -113,3 +101,4 @@
                             - "/root/traefik.yml:/etc/traefik/traefik.yml"
                             - "/var/run/docker.sock:/var/run/docker.sock"
                             - "/root/acme.json:/etc/traefik/acme.json"
+                            - "/root/dynamic-conf.yml:/etc/traefik/dynamic-conf.yml"
