@@ -28,7 +28,7 @@
 
           - name: copy files
             copy:
-                    src: {{ item }}
+                    src: "{{ item }}"
                     dest: /root/
             with_lines: "find ./files/ -type f"
 
@@ -102,3 +102,5 @@
                             - "/var/run/docker.sock:/var/run/docker.sock"
                             - "/root/acme.json:/etc/traefik/acme.json"
                             - "/root/dynamic-conf.yml:/etc/traefik/dynamic-conf.yml"
+                            - "/root/supercert.pem:/etc/traefik/supercert.pem"
+                            - "/root/supercert.key:/etc/traefik/supercert.key"
