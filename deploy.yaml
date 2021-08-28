@@ -67,14 +67,6 @@
                     restart_policy: always
                     ports:
                             - "8080:8080"
-                    labels:
-                            traefik.enable: "true"
-                            traefik.http.routers.web-53.entrypoints: "https"
-                            traefik.http.routers.web-53.rule: "Host(`app.gfd-39-comp-10.az.skillscloud.company`)"
-                            traefik.http.routers.web-53.tls: "true"
-                            traefik.http.routers.web-53.tls.certresolver: "letsEncrypt"
-
-                            traefik.http.services.web-53-service.loadbalancer.server.port: "8080"
 
           - name: Pull traefik
             become: yes

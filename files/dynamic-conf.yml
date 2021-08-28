@@ -4,3 +4,57 @@ tls:
       defaultCertificate:
         certFile: /etc/traefik/supercert.pem
         keyFile: /etc/traefik/supercert.key
+http:
+  routers:
+    host:
+      entryPoints: 
+      - http
+      - https
+      service: region-01
+      rule: Host(`region-01.gfd-39-comp-10.az.skillscloud.company`) 
+    host:
+      entryPoints: 
+      - http
+      - https
+      service: region-02
+      rule: Host(`region-02.gfd-39-comp-10.az.skillscloud.company`) 
+    host:
+      entryPoints: 
+      - http
+      - https
+      service: region-03
+      rule: Host(`region-03.gfd-39-comp-10.az.skillscloud.company`) 
+    host:
+      entryPoints: 
+      - http
+      - https
+      service: app
+      rule: Host(`app.gfd-39-comp-10.az.skillscloud.company`) 
+  services:
+    region-01:  
+      loadBalancer:
+        servers:
+        - url: http://127.0.0.1:8080/
+        passHostHeader: true 
+    region-02:  
+      loadBalancer:
+        servers:
+        - url: http://127.0.0.1:8080/
+        passHostHeader: true 
+    region-03:  
+      loadBalancer:
+        servers:
+        - url: http://127.0.0.1:8080/
+        passHostHeader: true 
+    
+    app:  
+      loadBalancer:
+        servers:
+                - url: http://region-01.gfd-39-comp-10.az.skillscloud.company
+                - url: http://region-02.gfd-39-comp-10.az.skillscloud.company
+                - url: http://region-01.gfd-39-comp-10.az.skillscloud.company
+        passHostHeader: true 
+        healthCheck:
+                path: /health
+                interval: "5s"
+                timeout: "3s"
