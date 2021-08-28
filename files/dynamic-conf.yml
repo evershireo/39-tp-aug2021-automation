@@ -8,25 +8,21 @@ http:
   routers:
     host:
       entryPoints: 
-      - http
       - https
       service: region-01
       rule: Host(`region-01.gfd-39-comp-10.az.skillscloud.company`) 
     host:
       entryPoints: 
-      - http
       - https
       service: region-02
       rule: Host(`region-02.gfd-39-comp-10.az.skillscloud.company`) 
     host:
       entryPoints: 
-      - http
       - https
       service: region-03
       rule: Host(`region-03.gfd-39-comp-10.az.skillscloud.company`) 
     host:
       entryPoints: 
-      - http
       - https
       service: app
       rule: Host(`app.gfd-39-comp-10.az.skillscloud.company`) 
@@ -52,7 +48,7 @@ http:
         servers:
                 - url: http://region-01.gfd-39-comp-10.az.skillscloud.company
                 - url: http://region-02.gfd-39-comp-10.az.skillscloud.company
-                - url: http://region-01.gfd-39-comp-10.az.skillscloud.company
+                - url: http://region-03.gfd-39-comp-10.az.skillscloud.company
         passHostHeader: true 
         healthCheck:
                 path: /health
