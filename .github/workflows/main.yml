@@ -1,0 +1,18 @@
+name: BuildApp
+on:
+  push:
+    paths:
+      - 'content-web/**'
+  workflow_dispatch:
+jobs:
+  clear_build_push:
+    runs-on: self-hosted
+    steps:
+      - run: sudo docker stop content-api
+      - run: sudo docker rm content-api
+      - run: sudo docker image rm content-api:latest
+      - uses: actions/checkout@v2
+      - run: cd content-api && sudo docker build -t content-api:latest .
+      - run: sudo docker tag content-api:latest fabmedical9op.azurecr.io/content-api/content-api
+      - run: sudo docker push fabmedical9op.azurecr.io/content-api/content-api
+      - run: sudo docker run -d --name content-api -p 3001:3001 -e MONGODB_CONNECTION='mongodb://172.17.0.1:27017/contentdb' content-api
